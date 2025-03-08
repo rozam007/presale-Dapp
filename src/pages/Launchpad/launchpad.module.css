@@ -1,0 +1,17 @@
+/* .cardBg {
+  background: linear-gradient(
+      63.96deg,
+      rgba(249, 255, 56, 0.06) 1.07%,
+      rgba(6, 29, 49, 0.06) 86.86%
+    ),
+    hsla(0, 0%, 100%, 0.03);
+} */
+
+.progressBar {
+  height: 100%;
+  /* background: linear-gradient(90deg, #fff, var(--theme-color)); */
+  background: var(--theme-color);
+
+  /* box-shadow: 0 2px 10.5px var(--theme-color); */
+  border-radius: 0;
+}

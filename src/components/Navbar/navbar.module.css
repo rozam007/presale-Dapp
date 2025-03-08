@@ -1,0 +1,10 @@
+.headerImage {
+  /* background-image: url(/header.svg), linear-gradient(#1e1c22, #1e1c22); */
+  background-image: url(/header.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* background-size: 100% 100%; */
+  /* background-position: left; */
+  background-position-x: -700px;
+  /* background-position-y: 80px; */
+}

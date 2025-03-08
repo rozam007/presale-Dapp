@@ -1,0 +1,28 @@
+.cardBox {
+  /* max-width: 576px; */
+  background: #000;
+  border: 3px solid var(--theme-color);
+  box-shadow: inset 0 0.939609px 0 hsla(0, 0%, 100%, 0.12);
+  -webkit-backdrop-filter: blur(14.423px);
+  backdrop-filter: blur(14.423px);
+  padding: 15px;
+  border-radius: 11.2753px;
+}
+
+.cardBg {
+  background: linear-gradient(
+      63.96deg,
+      rgba(249, 255, 56, 0.06) 1.07%,
+      rgba(6, 29, 49, 0.06) 86.86%
+    ),
+    hsla(0, 0%, 100%, 0.03);
+}
+
+.connectButton {
+  padding: 0px 24px;
+  font-weight: 600;
+  box-shadow: inset 0 0.939609px 0.939609px hsla(0, 0%, 100%, 0.25);
+  color: var(--theme-color);
+  background: linear-gradient(90deg, rgba(45, 199, 194, 0.4), #061d31 107.6%);
+  border-radius: 7.51687px;
+}

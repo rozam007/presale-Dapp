@@ -1,0 +1,25 @@
+.cardBg {
+  background: linear-gradient(
+      63.96deg,
+      rgba(249, 255, 56, 0.06) 1.07%,
+      rgba(6, 29, 49, 0.06) 86.86%
+    ),
+    hsla(0, 0%, 100%, 0.03);
+}
+
+.inputBox {
+  outline: none;
+  background: rgba(17, 24, 30, 0.32);
+  border: 1.40941px solid hsla(0, 0%, 100%, 0.12);
+  box-shadow: inset 0 0.626406px 0.626406px hsla(0, 0%, 100%, 0.12);
+  /* border-radius: 11.2753px; */
+  border-radius: 6px;
+  height: 41px;
+  padding: 0 18px;
+  font-weight: 700;
+  width: 100%;
+  min-width: 280px;
+  /* display: flex;
+  align-items: center;
+  justify-content: space-between; */
+}
