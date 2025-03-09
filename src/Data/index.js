@@ -60,23 +60,23 @@ export const presaleSummary = [
 //  <----------How To Buy Section------>
 
 export const buySectionCard = [
-  {
-    image: "/wallet.svg",
-    title: "Sign-Up",
-    paragraph:
-      "Open your preferred web browser and visit our official website: https://earlymint.io, Click “connect wallet & pay” button and ensure you are on the Ethereum blockchain (ERC20).",
-  },
+  // {
+  //   image: "/wallet.svg",
+  //   title: "Sign-Up",
+  //   paragraph:
+  //     "Open your preferred web browser and visit our official website: https://earlymint.io, Click “connect wallet & pay” button and ensure you are on the Ethereum blockchain (ERC20).",
+  // },
   {
     image: "/coins.svg",
-    title: "Select Currency",
+    title: "Select Presale",
     paragraph:
-      "Via the EarlyMint web3 dApp, select which cryptocurrency you want to use to make your purchase. If you do not have crypto you can use your card.",
+      "Explore and select a presale of your choice! Browse through available presales and choose the one that best fits your investment goals. Stay informed, make confident decisions, and participate seamlessly in the presale of your preference.",
   },
   {
     image: "/user.svg",
     title: "Buy & Claim",
     paragraph:
-      "Verify the transaction details inside your wallet and confirm the transaction, once this is successful your tokens will automatically be sent to your dashboard within 5-10 minutes depending on network congestion.",
+      "Select a presale, purchase tokens, and claim them effortlessly! Choose your preferred presale, complete your purchase securely, and claim your tokens once they become available—all in just a few clicks.",
   },
 ];
 

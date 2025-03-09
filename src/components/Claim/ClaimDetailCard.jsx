@@ -1,7 +1,31 @@
 import React from "react";
 import styles from "./claim.module.css";
+import { useReadContract } from "thirdweb/react";
+import { useGetPresaleContract } from "../../Hooks";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const ClaimDetailCard = () => {
+const ClaimDetailCard = ({ ethContributed, presaleAddress }) => {
+  const presaleContract = useGetPresaleContract(presaleAddress);
+
+  if (!presaleContract) {
+    toast.error("Please connect your wallet.");
+  }
+  const { data: saleRate } = useReadContract({
+    presaleContract,
+    method: "saleRate",
+  });
+
+  const { data: tokenDecimals } = useReadContract({
+    presaleContract,
+    method: "saleRate",
+  });
+
+  let computedTokens = 0;
+  if (ethContributed !== undefined) {
+    computedTokens =
+      (Number(ethContributed) * saleRate) / 10 ** (18 + tokenDecimals - 18);
+  }
   return (
     <>
       <div className={`${styles.cardBox} w-full lg:w-[576px]`}>
@@ -18,10 +42,11 @@ const ClaimDetailCard = () => {
           <div className="flex flex-col items-center w-full mt-1">
             <div>
               <span className="text-themeColor">Contributed Etherium :</span>{" "}
-              0.0017
+              {ethContributed}
             </div>
             <div>
-              <span className="text-themeColor">Claimed Tokens : </span>5
+              <span className="text-themeColor">Claimed Tokens : </span>
+              {computedTokens}
             </div>
           </div>
 
@@ -29,7 +54,7 @@ const ClaimDetailCard = () => {
           <button
             className={`${styles.connectButton} text-center h-[30.78px] md:h-[45px]`}
           >
-            Claim
+            Claim Tokens
           </button>
         </div>
       </div>

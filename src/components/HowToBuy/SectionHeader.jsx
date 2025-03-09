@@ -22,7 +22,7 @@ const SectionHeader = () => {
           />
         </div>
         <span className="text-[15px] md:text-xl font-normal text-center">
-          Follow these 3 simple steps to buy EarlyMint presale tokens.
+          Follow these 2 simple steps to buy presale tokens.
         </span>
       </div>
     </>

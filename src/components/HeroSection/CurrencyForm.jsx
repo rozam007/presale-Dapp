@@ -3,9 +3,9 @@ import styles from "./herosection.module.css";
 import { currencyNavTabs, exchangedToken, exchangeRateInput } from "../../Data/index";
 
 const CurrencyForm = () => {
-  const [activeTab, setActiveTab] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState(0);
 
-  const progressBarWidth: number = 50;
+  const progressBarWidth = 50;
 
   return (
     <div className={`${styles.cardBox}`}>

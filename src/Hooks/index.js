@@ -7,6 +7,7 @@ import {
 import { thirdWebClient } from "../ThirdWebClient/index";
 // import { PresalePayload } from "@/types";
 import { factoryContractAddress } from "../Contants/index";
+// import presaleAbi from "../ABI/presaleContract.json"
 
 if (!factoryContractAddress) {
   throw new Error("Factory contract address is not defined");
@@ -15,11 +16,36 @@ if (!factoryContractAddress) {
 export const useGetContract = () => {
   const chain = useActiveWalletChain();
 
+  if (!chain) {
+    console.warn("No wallet connected. Returning null contract.");
+    return null;
+  }
+
   const contract = getContract({
     client: thirdWebClient,
     address: factoryContractAddress,
     chain,
   });
+  
+
+  return contract;
+};
+
+
+export const useGetPresaleContract = (presaleAddress) => {
+  const chain = useActiveWalletChain();
+
+  if (!chain) {
+    console.warn("No wallet connected. Returning null contract.");
+    return null;
+  }
+  
+  const contract = getContract({
+    client: thirdWebClient,
+    address: presaleAddress,
+    chain,
+  });
+  console.log('address: ', presaleAddress, 'chain: ', chain, 'contract: ', contract)
 
   return contract;
 };

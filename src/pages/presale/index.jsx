@@ -8,6 +8,8 @@ import { useGetContract } from "../../Hooks/index";
 import React from "react";
 import { useReadContract } from "thirdweb/react";
 import {useParams} from "react-router-dom"
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 // import { sepolia } from "thirdweb/chains";
 // import { getContract, Contract } from "thirdweb";
 // import { useReadContract } from "thirdweb/react";
@@ -26,7 +28,11 @@ const Presale = () => {
 //   const { presaleAddress } = params;
   const contract = useGetContract();
 
-  const { data: pool } = useReadContract({contract, method: "isInit", params: [presaleAddress]});
+  if (!contract) {
+      toast.error("Please connect your wallet.")
+    }
+
+  const { data: pool } = useReadContract({contract, method: "owner", params: ["0x942e8b700c0f72aC653D962E12CcDB81c1AEc09d"]});
   console.log('pool: ', pool)
 
   // const [contract, setContract] = useState<Contract | null>(null);
@@ -65,7 +71,7 @@ const Presale = () => {
 
   return (
     <>
-      <HeroSection />
+          <HeroSection presaleAddress={ presaleAddress} />
       <SectionPartition />
       <HowToBuy />
       {/* <TokenDetail /> */}

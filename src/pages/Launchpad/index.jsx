@@ -13,8 +13,8 @@ const Lanunchpad = () => {
   //   const history = useHistory();
   const [presales, setPresales] = useState([]);
 
-    const handleRouting = () => {
-      console.log('click')
+  const handleRouting = () => {
+    console.log("click");
     navigate(`/createPresale`);
   };
 
@@ -38,9 +38,13 @@ const Lanunchpad = () => {
       </div>
 
       {/* Cards Listing Grid  */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-items-center mb-4 gap-6">
-        <LaunchpadListCard presales={presales} />
-      </div>
+      {presales?.length === 0 ? (
+        <div className="flex justify-center items-center min-h-10"><p>Fetching Presales...</p></div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 justify-items-center mb-4 gap-6">
+          <LaunchpadListCard presales={presales} />
+        </div>
+      )}
     </div>
   );
 };
