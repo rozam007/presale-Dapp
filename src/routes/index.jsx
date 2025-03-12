@@ -13,9 +13,9 @@ export default (
   <Routes>
     <Route exact path="/" element={<Lanunchpad />} />
     <Route path="/createPresale" element={<CreatePresale/>} />
-    {/* <Route path="presale/:presaleAddress/claim" element={<PrivateRoutes dest={<Claim/>} /> } />
-    <Route path="/presale/:presaleAddress/admin" element={<Admin/>} /> */}
-    <Route path="presale/:presaleAddress/claim" element={<Claim/>} />
+    <Route path="presale/:presaleAddress/claim" element={<PrivateRoutes dest={<Claim/>} /> } />
+    {/* <Route path="/presale/:presaleAddress/admin" element={<Admin/>} /> */}
+    {/* <Route path="/presale/:presaleAddress/claim" element={<Claim/>} /> */}
     <Route path="/presale/:presaleAddress/admin" element={<Admin/>} />
     <Route path="/presale/:presaleAddress" element={<Presale/>} />
     {/* <Route path="/" element={<Home />} /> */}

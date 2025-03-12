@@ -1,7 +1,36 @@
 import React from "react";
 import styles from "./claim.module.css";
+import { useActiveAccount, useReadContract } from "thirdweb/react";
+import { useGetPresaleContract } from "../../Hooks";
+import presaleAbi from "../../ABI/presaleContract.json";
 
-const RefundDetailCard = () => {
+const RefundDetailCard = ({ presaleAddress }) => {
+  const contract = useGetPresaleContract(presaleAddress, presaleAbi);
+  const account = useActiveAccount();
+  
+  const { data: pool } = useReadContract({
+    contract,
+    method:
+    "function pool() public view returns (uint64, uint64, uint8, uint256, uint256, uint256, uint256, uint256, uint256)",
+  });
+  
+  const { data: tokenDecimals } = useReadContract({
+    contract,
+    method: "function tokenDecimals() public view returns(uint8)",
+  });
+
+   const { data: ethContributed } = useReadContract({
+    contract,
+    method: "function ethContribution(address) public view returns (uint256)",
+    params: [account?.address],
+  });
+  
+  console.log("eth: ", ethContributed);
+  let computedTokens = 0;
+  if (ethContributed !== undefined) {
+    computedTokens =
+      (Number(ethContributed) * Number(pool?.[3])) / 10 ** (18 + tokenDecimals - 18);
+  }
   return (
     <>
       <div className={`${styles.cardBox} w-full lg:w-[576px]`}>
@@ -17,11 +46,12 @@ const RefundDetailCard = () => {
           {/*  Funds Stats */}
           <div className="flex flex-col items-center w-full mt-1">
             <div>
-              <span className="text-themeColor">Contributed Etherium :</span>{" "}
-              0.0017
+              <span className="text-themeColor">Contributed Etherium :</span>
+              {ethContributed}
             </div>
             <div>
-              <span className="text-themeColor">Refund Tokens : </span>5
+              <span className="text-themeColor">Refund Tokens : </span>
+              {computedTokens}
             </div>
           </div>
 

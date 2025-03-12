@@ -126,24 +126,21 @@ export const query = gql`query GetPresales(
 
 export const GET_EXACT_PRESALES = gql`
   query GetExactPresales(
-    $id: ID
-    $owner: String
-    $presaleAddress: Int
-    $startTime: Int
-    $endTime: Int
+    $id: Bytes
+    $owner: Bytes
+    $presaleAddress: Bytes
+    $startTime: BigInt
+    $endTime: BigInt
     $liquidityPortion: Int
-    $saleRate: Int
-    $listingRate: Int
-    $hardCap: Int
-    $softCap: Int
-    $maxBuy: Int
-    $minBuy: Int
+    $saleRate: BigInt
+    $listingRate: BigInt
+    $hardCap: BigInt
+    $softCap: BigInt
+    $maxBuy: BigInt
+    $minBuy: BigInt
   ) {
     presaleCreateds(
-   
-        first: 5
-        
-      
+      first: 1000
     ) {
       id
       owner

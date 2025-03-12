@@ -1,14 +1,22 @@
 import React from "react";
 import styles from "../HeroSection/herosection.module.css";
-import { presaleSummary } from "../../Data/index";
-import StatusTag from "../Common/StatusTag";
+// import { presaleSummary } from "../../Data/index";
+// import StatusTag from "../Common/StatusTag";
 import SectionPartition from "../Common/SectionPartition";
-import { useActiveAccount, useSendTransaction } from "thirdweb/react";
+import {
+  useActiveAccount,
+  useReadContract,
+  useSendTransaction,
+} from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useGetPresaleContract } from "../../Hooks";
+import { useGetPresaleContract, useTokensSold } from "../../Hooks";
 import { useParams } from "react-router-dom";
+import presaleAbi from "../../ABI/presaleContract.json";
+import { poolMappings } from "../../Contants";
+import { formatUnixTimestamp } from "../../Utils";
+import SaleStatus, { getSaleStatus } from "../SaleStatus";
 
 const InfoTag = ({ title, value }) => {
   return (
@@ -27,31 +35,32 @@ const DepositTokenInput = () => (
   />
 );
 
-const PresaleSummary = ({ presaleAddress }) => {
-  const { presaleAddres } = useParams()
-  console.log('address: ', presaleAddres)
-  const tokenSoldPercentage = 70;
-  const softcapPercentage = 33; // Softcap percentage (e.g., 30%)
-  const hardcapPercentage = 100; // Hardcap percentage (e.g., 80%)
-  const softcapAmount = "3000"; // Softcap amount
-  const hardcapAmount = "10000"; // Hardcap amount
+const PresaleSummary = () => {
+  const { presaleAddress } = useParams();
+  const presaleContract = useGetPresaleContract(presaleAddress, presaleAbi);
 
-  const presaleContract = useGetPresaleContract("0xc3bea5c5cf0debc79afea5404566fcd68308d6da");
-
-   if (!presaleContract) {
-        toast.error("Please connect your wallet.")
-      }
   const walletAddress = useActiveAccount();
-  const { mutateAsync: depositTheTokens, isPending: isPendingDepositTokens } = useSendTransaction();
-  const { mutateAsync: finishTheSales, isPending: isPendingFinishSales } = useSendTransaction();
-  const { mutateAsync: withDrawTheTokens, isPending: isPendingWithDrawTokens } = useSendTransaction();
-  const { mutateAsync: cancelTheSales, isPending: isPendingCancelSales } = useSendTransaction();
+  const { mutateAsync: depositTheTokens, isPending: isPendingDepositTokens } =
+    useSendTransaction();
+  const { mutateAsync: finishTheSales, isPending: isPendingFinishSales } =
+    useSendTransaction();
+  const { mutateAsync: withDrawTheTokens, isPending: isPendingWithDrawTokens } =
+    useSendTransaction();
+  const { mutateAsync: cancelTheSales, isPending: isPendingCancelSales } =
+    useSendTransaction();
   // const { mutateAsync: enableTheRefund, isPending: isPendingEnableRefund } = useSendTransaction();
+
+  const { data: isRefund } = useReadContract({
+    contract: presaleContract,
+    method: "function isRefund() public returns (bool)",
+  });
+
+  console.log("isRefund: ", isRefund);
 
   const depositTokens = async () => {
     try {
       if (!walletAddress) {
-        alert("Please connect your wallet.");
+        toast.error("Please connect your wallet.");
         return;
       }
 
@@ -74,7 +83,7 @@ const PresaleSummary = ({ presaleAddress }) => {
   const finishSales = async () => {
     try {
       if (!walletAddress) {
-        alert("Please connect your wallet.");
+        toast.error("Please connect your wallet.");
         return;
       }
 
@@ -89,7 +98,7 @@ const PresaleSummary = ({ presaleAddress }) => {
       });
       await finishTheSales(approveTx);
       console.log("Finished Successfully:", approveTx);
-      toast.success("Finished Successfully!!")
+      toast.success("Finished Successfully!!");
     } catch (error) {
       console.error("Transaction failed:", error);
       toast.error("Transaction failed. Check console for details.");
@@ -98,7 +107,7 @@ const PresaleSummary = ({ presaleAddress }) => {
   const withDrawTokens = async () => {
     try {
       if (!walletAddress) {
-        alert("Please connect your wallet.");
+        toast.error("Please connect your wallet.");
         return;
       }
 
@@ -109,11 +118,12 @@ const PresaleSummary = ({ presaleAddress }) => {
 
       const approveTx = await prepareContractCall({
         contract: presaleContract,
-        method: "function withrawTokens() external onlyOwner onlyInactive onlyRefund",
+        method:
+          "function withrawTokens() external onlyOwner onlyInactive onlyRefund",
       });
       await withDrawTheTokens(approveTx);
       console.log("Withdrawed Successfully:", approveTx);
-      toast.success("Withdrawed Successfully!!")
+      toast.success("Withdrawed Successfully!!");
     } catch (error) {
       console.error("Transaction failed:", error);
       toast.error("Transaction failed. Check console for details.");
@@ -122,7 +132,7 @@ const PresaleSummary = ({ presaleAddress }) => {
   const cancelSales = async () => {
     try {
       if (!walletAddress) {
-        alert("Please connect your wallet.");
+        toast.error("Please connect your wallet.");
         return;
       }
 
@@ -137,7 +147,7 @@ const PresaleSummary = ({ presaleAddress }) => {
       });
       await cancelTheSales(approveTx);
       console.log("Cancelled Successfully:", approveTx);
-      toast.success("Cancelled Successfully!!")
+      toast.success("Cancelled Successfully!!");
     } catch (error) {
       console.error("Transaction failed:", error);
       toast.error("Transaction failed. Check console for details.");
@@ -168,6 +178,56 @@ const PresaleSummary = ({ presaleAddress }) => {
   //   }
   // };
 
+  const contract = useGetPresaleContract(presaleAddress, presaleAbi);
+  const { data: presaleData } = useReadContract({
+    contract: contract,
+    method:
+      "function pool() public view returns (uint64, uint64, uint8, uint256, uint256, uint256, uint256, uint256, uint256)",
+  });
+
+  const { data: ethRaised } = useReadContract({
+    contract: contract,
+    method: "function ethRaised() public view returns (uint256)",
+  });
+
+  console.log("isRefund: ", isRefund);
+
+  const startDateIndex = poolMappings["startDate"];
+  const endDateIndex = poolMappings["endDate"];
+  const liquidityPortionIndex = poolMappings["liquidityPortion"];
+  const saleRateIndex = poolMappings["saleRate"];
+  const listingRateIndex = poolMappings["listingRate"];
+  const hardCapIndex = poolMappings["hardCap"];
+  const softCapIndex = poolMappings["softCap"];
+  const maxBuyIndex = poolMappings["maxBuy"];
+  const minBuyIndex = poolMappings["minBuy"];
+
+  let startDate = null;
+  let endDate = null;
+  let liquidityPortion = null;
+  let saleRate = null;
+  let listingRate = null;
+  let hardCap = null;
+  let softCap = null;
+  let maxBuy = null;
+  let minBuy = null;
+  if (presaleData) {
+    startDate = formatUnixTimestamp(Number(presaleData[startDateIndex]));
+    endDate = formatUnixTimestamp(Number(presaleData[endDateIndex]));
+    liquidityPortion = presaleData[liquidityPortionIndex];
+    saleRate = Number(presaleData[saleRateIndex]);
+    listingRate = Number(presaleData[listingRateIndex]);
+    hardCap = Number(presaleData[hardCapIndex]);
+    softCap = Number(presaleData[softCapIndex]);
+    maxBuy = Number(presaleData[maxBuyIndex]);
+    minBuy = Number(presaleData[minBuyIndex]);
+  }
+
+  const { tokenSold } = useTokensSold(presaleAddress, saleRate);
+  const saleStatus = getSaleStatus(presaleData?.[0], presaleData?.[1]);
+  const hardCapPercentage = 100;
+  const softCapPercentage = (softCap / hardCap) * 100;
+  const tokensSoldPercentage = (Number(tokenSold || 0) / Number(hardCap)) * 100;
   return (
     <div className="flex flex-col gap-16">
       {/* Deposit Tokens */}
@@ -182,7 +242,7 @@ const PresaleSummary = ({ presaleAddress }) => {
                 <span className="">Deposit Tokens</span>
               </div>
 
-              <DepositTokenInput />
+              {/* <DepositTokenInput /> */}
 
               {/* Connect button  */}
               <div className="flex justify-between gap-4">
@@ -234,7 +294,11 @@ const PresaleSummary = ({ presaleAddress }) => {
               className={`${styles.cardBg} w-full flex flex-col gap-6 p-4 text-[10.28px] md:text-[15.05px]`}
             >
               <div className="flex justify-end">
-                <StatusTag status="Sale Live" />
+                {/* <StatusTag status="Sale Live" /> */}
+                <SaleStatus
+                  startTime={presaleData?.[0]}
+                  endTime={presaleData?.[1]}
+                />
               </div>
               {/* Heading  */}
               <div className="flex flex-col items-center text-[18.58px] md:text-[27.17px] font-bold">
@@ -247,7 +311,7 @@ const PresaleSummary = ({ presaleAddress }) => {
                 <div
                   className="absolute text-xs text-white font-medium -top-6"
                   style={{
-                    left: `${softcapPercentage}%`,
+                    left: `${softCapPercentage}%`,
                     transform: "translateX(-100%)",
                   }}
                 >
@@ -258,7 +322,7 @@ const PresaleSummary = ({ presaleAddress }) => {
                 <div
                   className="absolute text-xs text-white font-medium -top-6"
                   style={{
-                    left: `${hardcapPercentage}%`,
+                    left: `${hardCapPercentage}%`,
                     transform: "translateX(-100%)",
                   }}
                 >
@@ -269,24 +333,24 @@ const PresaleSummary = ({ presaleAddress }) => {
                 <div className="bg-[#091F2F] h-[22px] w-full relative flex items-center">
                   <div
                     className={`${styles.progressBar} max-w-full transition-all duration-300 ease-in-out bg-green-500 h-full`}
-                    style={{ width: `${tokenSoldPercentage}%` }}
+                    style={{ width: `${tokensSoldPercentage}%` }}
                   ></div>
 
                   {/* Softcap Marker */}
                   <div
                     className="absolute h-[150%] w-[2px] bg-yellow-300"
-                    style={{ left: `${softcapPercentage}%` }}
+                    style={{ left: `${softCapPercentage}%` }}
                   ></div>
 
                   {/* Hardcap Marker */}
                   <div
                     className="absolute h-[150%] w-[2px] bg-red-500"
-                    style={{ left: `${hardcapPercentage}%` }}
+                    style={{ left: `${hardCapPercentage}%` }}
                   ></div>
 
                   {/* Sold Percentage */}
                   <span className="absolute font-medium right-2 opacity-60 text-white">
-                    {tokenSoldPercentage.toFixed(2)}% Sold
+                    {tokensSoldPercentage.toFixed(2)}% Sold
                   </span>
                 </div>
 
@@ -294,50 +358,107 @@ const PresaleSummary = ({ presaleAddress }) => {
                 <div
                   className="absolute text-xs text-white font-medium mt-2"
                   style={{
-                    left: `${softcapPercentage}%`,
+                    left: `${softCapPercentage}%`,
                     transform: "translateX(-100%)",
                   }}
                 >
-                  {softcapAmount}
+                  {softCap}
                 </div>
 
                 {/* Hardcap Amount (Below Marker) */}
                 <div
                   className="absolute text-xs text-white font-medium mt-2"
                   style={{
-                    left: `${hardcapPercentage}%`,
+                    left: `${hardCapPercentage}%`,
                     transform: "translateX(-100%)",
                   }}
                 >
-                  {hardcapAmount}
+                  {hardCap}
                 </div>
               </div>
 
               {/*  Funds Stats */}
               <div className="flex flex-col items-center w-full mt-1">
-                {presaleSummary.map(({ title, value }) => (
+                {/* {presaleSummary.map(({ title, value }) => (
                   <InfoTag key={title} title={title} value={value} />
-                ))}
+                ))} */}
+                <div>
+                  <span className="text-themeColor">Eth Raised : </span>
+                  {ethRaised}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Tokens Sold : </span>
+                  {tokenSold}
+                </div>
+                <div>
+                  <span className="text-themeColor">Start Date : </span>
+                  {startDate}
+                </div>
+                <div>
+                  <span className="text-themeColor">End Date : </span>
+                  {endDate}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Liquidity Portion : </span>
+                  {liquidityPortion}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Sale Rate : </span>
+                  {saleRate}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Listing Rate : </span>
+                  {listingRate}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Hard Cap : </span>
+                  {hardCap}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Soft Cap : </span>
+                  {softCap}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Max Buy : </span>
+                  {maxBuy}
+                </div>
+
+                <div>
+                  <span className="text-themeColor">Min Buy : </span>
+                  {minBuy}
+                </div>
               </div>
 
               {/* Connect button  */}
               <div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-4">
                   <button
+                    // disabled={saleStatus === 'Ended'}
                     onClick={() => finishSales()}
                     className={`${styles.connectButton} w-full text-center h-[30.78px] md:h-[45px]`}
                   >
                     {isPendingFinishSales ? "Finishing..." : "Finish Sale"}
                   </button>
                   <button
+                    disabled={isRefund === false}
                     onClick={() => withDrawTokens()}
                     className={`${styles.connectButton} w-full text-center h-[30.78px] md:h-[45px]`}
                   >
-                    {isPendingWithDrawTokens ? "Withdrawing..." : "Withdraw Funds"}
+                    {isPendingWithDrawTokens
+                      ? "Withdrawing..."
+                      : "Withdraw Funds"}
                   </button>
                 </div>
                 <div className="flex justify-between gap-4">
                   <button
+                    disabled={saleStatus === "Ended"}
                     onClick={() => cancelSales()}
                     className={`${styles.connectButton} w-full text-center h-[30.78px] md:h-[45px]`}
                   >

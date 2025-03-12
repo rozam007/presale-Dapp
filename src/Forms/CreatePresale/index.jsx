@@ -83,9 +83,9 @@ const CreatePresaleForm = () => {
                     <input
                       disabled={isPending}
                       id="datetime"
-                      type="date"
+                      type="datetime-local"
                       {...register(field.fieldName, {
-                        required: "This field is required",
+                        required: `${field.label} is required`,
                       })}
                       className={`${styles.inputBox}`}
                     />
@@ -93,7 +93,7 @@ const CreatePresaleForm = () => {
                     <input
                       disabled={isPending}
                       {...register(field.fieldName, {
-                        required: "This field is required",
+                        required: `${field.label} is required`,
                         pattern:
                           field.fieldName.includes("Rate") ||
                           field.fieldName.includes("Cap") ||

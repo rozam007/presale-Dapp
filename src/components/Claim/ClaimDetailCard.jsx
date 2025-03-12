@@ -1,30 +1,36 @@
 import React from "react";
 import styles from "./claim.module.css";
-import { useReadContract } from "thirdweb/react";
+import { useActiveAccount, useReadContract } from "thirdweb/react";
 import { useGetPresaleContract } from "../../Hooks";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import presaleAbi from "../../ABI/presaleContract.json";
 
-const ClaimDetailCard = ({ ethContributed, presaleAddress }) => {
-  const presaleContract = useGetPresaleContract(presaleAddress);
+const ClaimDetailCard = ({ presaleAddress }) => {
+  const contract = useGetPresaleContract(presaleAddress, presaleAbi);
+  const account = useActiveAccount();
 
-  if (!presaleContract) {
-    toast.error("Please connect your wallet.");
-  }
-  const { data: saleRate } = useReadContract({
-    presaleContract,
-    method: "saleRate",
+  const { data: pool } = useReadContract({
+    contract,
+    method:
+      "function pool() public view returns (uint64, uint64, uint8, uint256, uint256, uint256, uint256, uint256, uint256)",
   });
 
   const { data: tokenDecimals } = useReadContract({
-    presaleContract,
-    method: "saleRate",
+    contract,
+    method: "function tokenDecimals() public view returns(uint8)",
+  });
+
+  const { data: ethContributed } = useReadContract({
+    contract,
+    method: "function ethContribution(address) public view returns (uint256)",
+    params: [account?.address],
   });
 
   let computedTokens = 0;
   if (ethContributed !== undefined) {
     computedTokens =
-      (Number(ethContributed) * saleRate) / 10 ** (18 + tokenDecimals - 18);
+      (Number(ethContributed) * Number(pool?.[3])) / 10 ** (18 + tokenDecimals - 18);
   }
   return (
     <>

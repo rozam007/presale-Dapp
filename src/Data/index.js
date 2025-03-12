@@ -15,7 +15,7 @@ export const logoTitle = {
 export const disclaimer = {
   title: "Disclaimer",
   Paragraph:
-    " Digital currencies may be unregulated in your jurisdiction. The value of digital currencies may go down as well as up. Profits may be subject to capital gains or other taxes applicable in your jurisdiction.",
+    "Participating in ICOs involves risks, including financial loss and regulatory uncertainties. We do not endorse or guarantee any project listed on this platform. Conduct your own research before investing. We are not liable for any losses or legal issues.",
 };
 
 export const contactInfo = [
@@ -52,8 +52,14 @@ export const formFields = [
 export const presaleSummary = [
   {title: 'ETH Raised: ', value: '3000'},
   {title: 'Token Sold: ', value: '300000'},
-  {title: 'Soft Cap: ', value: '5000'},
+  {title: 'Start Date: ', value: '300000'},
+  {title: 'End Date: ', value: '300000'},
+  {title: 'Sale Rate: ', value: '300000'},
+  {title: 'Listing Rate: ', value: '300000'},
   {title: 'Hard Cap: ', value: '10000'},
+  {title: 'Soft Cap: ', value: '5000'},
+  {title: 'Max Buy: ', value: '5000'},
+  {title: 'Min Buy: ', value: '5000'},
   {title: 'Time Left: ', value: '2 days'},
 ]
 
@@ -103,7 +109,7 @@ export const exchangeRateInput = [
     currency: "ETH",
     rate: 0.0539,
     image: "/eth.png",
-    inputType: "text",
+    inputType: "number",
   },
   {
     currency: "USDT",

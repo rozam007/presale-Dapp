@@ -9,7 +9,7 @@ const FooterLogo = () => {
       <div className="">
         <div className="flex items-center pb-4 text-black md:pb-0">
           <img
-            src="logo-black.svg"
+            src="/logo-black.svg"
             alt="log"
             className="w-[31.01px] h-[16.02px] md:w-[55.71px] md:h-[28.78px]"
           />

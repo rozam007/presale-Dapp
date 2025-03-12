@@ -7,45 +7,45 @@ import {
 import { thirdWebClient } from "../ThirdWebClient/index";
 // import { PresalePayload } from "@/types";
 import { factoryContractAddress } from "../Contants/index";
-// import presaleAbi from "../ABI/presaleContract.json"
+// import factoryAbi from "../ABI/factoryContract.json"
+import presaleAbi from "../ABI/presaleContract.json"
+import { sepolia } from "thirdweb/chains";
 
 if (!factoryContractAddress) {
   throw new Error("Factory contract address is not defined");
 }
 
 export const useGetContract = () => {
-  const chain = useActiveWalletChain();
+  // const chain = useActiveWalletChain();
 
-  if (!chain) {
-    console.warn("No wallet connected. Returning null contract.");
-    return null;
-  }
+  // if (!chain) {
+  //   console.warn("No wallet connected. Returning null contract.");
+  //   return null;
+  // }
 
   const contract = getContract({
     client: thirdWebClient,
     address: factoryContractAddress,
-    chain,
+    chain: sepolia,
   });
-  
 
   return contract;
 };
 
+export const useGetPresaleContract = (presaleAddress, abi) => {
+  // const chain = useActiveWalletChain();
 
-export const useGetPresaleContract = (presaleAddress) => {
-  const chain = useActiveWalletChain();
+  // if (!chain) {
+  //   console.warn("No wallet connected. Returning null contract.");
+  //   return null;
+  // }
 
-  if (!chain) {
-    console.warn("No wallet connected. Returning null contract.");
-    return null;
-  }
-  
   const contract = getContract({
     client: thirdWebClient,
     address: presaleAddress,
-    chain,
+    chain: sepolia,
+    abi: abi,
   });
-  console.log('address: ', presaleAddress, 'chain: ', chain, 'contract: ', contract)
 
   return contract;
 };
@@ -136,11 +136,16 @@ export const useCreatePresale = () => {
   };
 };
 
-export const useTokensSold = (saleRate) => {
-  const contract = useGetContract();
+export const useTokensSold = (presaleAddress, saleRate) => {
+  const contract = useGetPresaleContract(presaleAddress, presaleAbi);
   const TOKEN_DECIMALS = 18;
 
-  const {data: ethRaised} = useReadContract({contract, method: "ethRaised"});
+  const { data: ethRaised } = useReadContract({
+    contract,
+    method: "function ethRaised() public view returns (uint256)",
+  });
+
+  console.log("ethRaised: ", ethRaised, saleRate);
 
   let computedTokensSold = 0;
   if (ethRaised !== undefined) {

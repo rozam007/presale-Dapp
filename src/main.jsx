@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./styles.css"; // Ensure this file exists
 import { ThirdwebProvider } from "thirdweb/react";
+import { ApolloProvider } from "@apollo/client";
+import client from "./lib/apollo-client.js";
 
 const rootElement = document.getElementById("root");
 
@@ -14,9 +16,11 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <ThirdwebProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ApolloProvider client={client}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ApolloProvider>
     </ThirdwebProvider>
   </StrictMode>
 );

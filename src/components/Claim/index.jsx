@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ClaimContent from "./ClaimContent";
 import ClaimCard from "./ClaimDetailCard";
 import RefundContent from "./RefundContent";
@@ -6,53 +6,54 @@ import RefundDetailCard from "./RefundDetailCard";
 import SectionPartition from "../Common/SectionPartition";
 import { useActiveAccount, useReadContract } from "thirdweb/react";
 import { useGetPresaleContract } from "../../Hooks";
+import presaleAbi from "../../ABI/presaleContract.json";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Claim = ({ presaleAddress }) => {
-  const contract = useGetPresaleContract(presaleAddress);
-   if (!contract) {
+  const contract = useGetPresaleContract(presaleAddress, presaleAbi);
+  const account = useActiveAccount();
+
+  const { data: isRefund } = useReadContract({
+    contract,
+    method: "function isRefund() public view returns (bool)",
+  });
+
+  console.log("isRefund: ", isRefund);
+
+  const { data: isFinished } = useReadContract({
+    contract,
+    method: "function isFinish() public view returns (bool)",
+  });
+
+  const { data: ethContributed } = useReadContract({
+    contract,
+    method: "function ethContribution(address) public view returns (uint256)",
+    params: [account?.address],
+  });
+
+  console.log("isFinished: ", isFinished);
+  console.log("ethContributed: ", ethContributed);
+
+  useEffect(() => {
+    if (!account) {
       toast.error("Please connect your wallet.");
     }
-  const walletAddress = useActiveAccount()
-
-  const {
-    data: isRefund,
-    error,
-    isError,
-  } = useReadContract({
-    contract,
-    method: "isRefund",
-  });
-
-  const {
-    data: ethContributed
-  } = useReadContract({
-    contract,
-    method: "ethRaised",
-    params: [walletAddress]
-  });
-
-  const {
-    data: isFinished
-  } = useReadContract({
-    contract,
-    method: "isFinish",
-  });
-  console.log("isRefund: ", isRefund, error, isError);
-  console.log('ethRaised: ', ethContributed)
-  console.log('isFinished: ', isFinished)
+  }, [account]);
 
   return (
     <div>
       {/* Claim Section  */}
-      {/* {!isRefund && isFinished && ethContributed > 0 ( */}
-        <div className="container mx-auto my-10 p-4">
-          <div className="flex flex-col md:flex-row justify-evenly items-center gap-10">
-            <ClaimContent />
-          <ClaimCard ethContributed={ethContributed} presaleAddress={ presaleAddress} />
-          </div>
+      {/* {!isRefund &&
+        isFinished &&
+        ethContributed >
+          0 && ( */}
+      <div className="container mx-auto my-10 p-4">
+        <div className="flex flex-col md:flex-row justify-evenly items-center gap-10">
+          <ClaimContent />
+          <ClaimCard presaleAddress={presaleAddress} />
         </div>
+      </div>
       {/* )} */}
 
       <div className="hidden md:block">
@@ -62,12 +63,12 @@ const Claim = ({ presaleAddress }) => {
       {/* Refund Section  */}
 
       {/* {isRefund && ( */}
-        <div className="container mx-auto my-10 p-4">
-          <div className="flex flex-col lg:flex-row justify-evenly items-start lg:items-center gap-10">
-            <RefundDetailCard />
-            <RefundContent />
-          </div>
+      <div className="container mx-auto my-10 p-4">
+        <div className="flex flex-col lg:flex-row justify-evenly items-start lg:items-center gap-10">
+          <RefundDetailCard presaleAddress={presaleAddress} />
+          <RefundContent />
         </div>
+      </div>
       {/* )} */}
     </div>
   );

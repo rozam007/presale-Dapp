@@ -4,6 +4,7 @@ import { useTokensSold } from "../../Hooks/index";
 // import { Presale } from "@/types";
 import SaleCountdown from "../../components/SaleCountDown.jsx/index";
 import { Link } from "react-router-dom";
+import SaleStatus from "../SaleStatus";
 
 const LaunchpadListCard = ({ presales }) => {
   console.log("presales: ", presales);
@@ -17,20 +18,19 @@ const LaunchpadListCard = ({ presales }) => {
 };
 
 const PresaleCard = ({ card }) => {
-  const { hardCap, softCap, saleRate } = card;
+  const { hardCap, softCap, saleRate, startTime, endTime, presaleAddress } =
+    card;
   const softCapPercentage = (Number(softCap) / Number(hardCap)) * 100;
   const hardCapPercentage = 100;
 
-  // Call useTokensSold hook inside a component, NOT in .map()
-  const { tokenSold } = useTokensSold(Number(saleRate));
-  console.log("token sold: ", tokenSold);
+  const { tokenSold } = useTokensSold(presaleAddress, Number(saleRate));
   const tokensSoldPercentage = (Number(tokenSold || 0) / Number(hardCap)) * 100;
-  // const tokensSoldPercentage = 70;
 
   return (
     <div className="text-sm p-4 rounded-md w-full max-w-[368px] bg-launchpadBg">
       <div className="flex flex-col">
-        {/* Soft & Hard Cap */}
+        <SaleStatus startTime={startTime} endTime={endTime} />
+
         <div className="flex justify-between items-center gap-4 mt-0.5">
           <div className="text-sm text-whiteColor whitespace-nowrap text-ellipsis mt-6">
             <p>Soft - Hard</p>
@@ -42,20 +42,10 @@ const PresaleCard = ({ card }) => {
           </div>
         </div>
 
-        {/* Progress Bar */}
         <div className="mt-4 text-sm">
           <span>Progress</span> {""}
-          <span>({tokensSoldPercentage}) %</span>
+          <span>({tokensSoldPercentage}%)</span>
         </div>
-
-        {/* <div className="mt-0.5">
-          <div className="bg-[#113956] h-[22px] w-full relative flex items-center">
-            <div
-              className={`${styles.progressBar} w-[0%] max-w-full transition-all duration-300 ease-in-out`}
-              style={{ width: `${card.progressValue}%` }}
-            ></div>
-          </div>
-        </div> */}
 
         {/* Fundraising Progress Bar */}
         <div className="relative w-full mt-8">
@@ -104,11 +94,33 @@ const PresaleCard = ({ card }) => {
             <span className="absolute font-medium right-2 opacity-60 text-white">
               {tokensSoldPercentage.toFixed(2)} % Sold
             </span>
+
+            {/* Softcap Amount (Below Marker) */}
+            <div
+              className="absolute text-xs text-white font-medium mt-14"
+              style={{
+                left: `${softCapPercentage}%`,
+                transform: "translateX(-100%)",
+              }}
+            >
+              {softCap}
+            </div>
+
+            {/* Hardcap Amount (Below Marker) */}
+            <div
+              className="absolute text-xs text-white font-medium mt-14"
+              style={{
+                left: `${hardCapPercentage}%`,
+                transform: "translateX(-100%)",
+              }}
+            >
+              {hardCap}
+            </div>
           </div>
         </div>
 
         {/* Sale Start & End */}
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center justify-between mt-8">
           <SaleCountdown
             startTime={Number(card.startTime) || 0}
             endTime={Number(card.endTime) || 0}
@@ -123,30 +135,6 @@ const PresaleCard = ({ card }) => {
             </Link>
           </div>
         </div>
-        {/* <div className="flex justify-between items-center text-sm gap-2 mt-4">
-          {
-            currentTime < Number(card.startTime) ? 
-            <div className="flex flex-col">
-              <div>Sale Starts In</div>
-              <div className="font-medium text-sm">
-                {card.startTime || card.endTime}
-              </div>
-            </div>
-              :
-              
-               <div className="flex flex-col">
-              <div>Sale Ends In</div>
-              <div className="font-medium text-sm">
-                {card.startTime || card.endTime}
-              </div>
-            </div>
-        }
-          <div>
-            <Link href="/presale" className="bg-themeColor text-whiteColor px-2 py-1 rounded-sm">
-              View
-            </Link>
-          </div>
-        </div> */}
       </div>
     </div>
   );
